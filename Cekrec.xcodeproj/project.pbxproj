@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		642C046B2FA1BE980057DAFC /* Cekrec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Cekrec.app; path = "/Users/abr/project/Cekrec/build/Debug-iphoneos/Cekrec.app"; sourceTree = "<absolute>"; };
+		6450DE632FA3602200D649FD /* Cekrec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cekrec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -45,6 +45,7 @@
 				642C046D2FA1BE980057DAFC /* Cekrec */,
 				642C04AD2FA34B750057DAFC /* ViewModels */,
 				642C04AE2FA34B830057DAFC /* Models */,
+				6450DE632FA3602200D649FD /* Cekrec.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -72,7 +73,7 @@
 			packageProductDependencies = (
 			);
 			productName = Cekrec;
-			productReference = 642C046B2FA1BE980057DAFC /* Cekrec.app */;
+			productReference = 6450DE632FA3602200D649FD /* Cekrec.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
