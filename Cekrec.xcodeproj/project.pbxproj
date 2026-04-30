@@ -7,13 +7,23 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		642C046B2FA1BE980057DAFC /* Cekrec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cekrec.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		642C046B2FA1BE980057DAFC /* Cekrec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Cekrec.app; path = "/Users/abr/project/Cekrec/build/Debug-iphoneos/Cekrec.app"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		642C046D2FA1BE980057DAFC /* Cekrec */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Cekrec;
+			sourceTree = "<group>";
+		};
+		642C04AD2FA34B750057DAFC /* ViewModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		642C04AE2FA34B830057DAFC /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +43,9 @@
 			isa = PBXGroup;
 			children = (
 				642C046D2FA1BE980057DAFC /* Cekrec */,
-				642C046C2FA1BE980057DAFC /* Products */,
+				642C04AD2FA34B750057DAFC /* ViewModels */,
+				642C04AE2FA34B830057DAFC /* Models */,
 			);
-			sourceTree = "<group>";
-		};
-		642C046C2FA1BE980057DAFC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				642C046B2FA1BE980057DAFC /* Cekrec.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -62,6 +65,8 @@
 			);
 			fileSystemSynchronizedGroups = (
 				642C046D2FA1BE980057DAFC /* Cekrec */,
+				642C04AD2FA34B750057DAFC /* ViewModels */,
+				642C04AE2FA34B830057DAFC /* Models */,
 			);
 			name = Cekrec;
 			packageProductDependencies = (
@@ -95,7 +100,7 @@
 			mainGroup = 642C04622FA1BE980057DAFC;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 642C046C2FA1BE980057DAFC /* Products */;
+			productRefGroup = 642C04622FA1BE980057DAFC;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -256,11 +261,12 @@
 				DEVELOPMENT_TEAM = VMKDVWCB45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to add to our application";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need to access your photos to add them to our application";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -288,11 +294,12 @@
 				DEVELOPMENT_TEAM = VMKDVWCB45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to add to our application";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need to access your photos to add them to our application";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

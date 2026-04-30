@@ -1,9 +1,4 @@
-//
-//  CekrecApp.swift
-//  Cekrec
-//
-//  Created by abr on 29/04/26.
-//
+
 
 import SwiftUI
 
@@ -15,3 +10,4 @@ struct CekrecApp: App {
         }
     }
 }
+/Users/abr/project/Cekrec/Models

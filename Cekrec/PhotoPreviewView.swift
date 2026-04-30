@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import AVFoundation
 
-struct PhotoPreciewView: View {
+struct PhotoPreviewView: View {
     let item: IdentifiableImage
     let onDismiss: () -> Void
     
