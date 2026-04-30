@@ -26,6 +26,11 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		64AD70D82FA3885D0061A790 /* Views */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Views;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +50,7 @@
 				642C046D2FA1BE980057DAFC /* Cekrec */,
 				642C04AD2FA34B750057DAFC /* ViewModels */,
 				642C04AE2FA34B830057DAFC /* Models */,
+				64AD70D82FA3885D0061A790 /* Views */,
 				6450DE632FA3602200D649FD /* Cekrec.app */,
 			);
 			sourceTree = "<group>";
@@ -68,6 +74,7 @@
 				642C046D2FA1BE980057DAFC /* Cekrec */,
 				642C04AD2FA34B750057DAFC /* ViewModels */,
 				642C04AE2FA34B830057DAFC /* Models */,
+				64AD70D82FA3885D0061A790 /* Views */,
 			);
 			name = Cekrec;
 			packageProductDependencies = (
