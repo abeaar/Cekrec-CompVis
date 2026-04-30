@@ -24,6 +24,7 @@ struct ContentView: View {
                     .ignoresSafeArea()
             } else {
                 VStack {
+                    Text("apapun itu yabng bisa ditulis langsung")
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.gray)
