@@ -10,4 +10,3 @@ struct CekrecApp: App {
         }
     }
 }
-/Users/abr/project/Cekrec/Models
