@@ -23,27 +23,34 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
-                ZStack {
-                    CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                GeometryReader { geo in
+                    let screenWidth = geo.size.width
+                    let previewHeight = screenWidth * (16.0 / 9.0)
 
-                    if selectedGrid != .none {
-                        GridOverlayView(
-                            gridType: selectedGrid,
-                            subjects: visionManager.detectedSubjects
-                        )
-                    }
+                    ZStack {
+                        CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
 
-                    if !visionManager.detectedSubjects.isEmpty {
-                        BoundingBoxView(subjects: visionManager.detectedSubjects)
-                    }
+                        if selectedGrid != .none {
+                            GridOverlayView(
+                                gridType: selectedGrid,
+                                subjects: visionManager.detectedSubjects
+                            )
+                        }
 
-                    // Capture flash animation
-                    if cameraManager.showCaptureFlash {
-                        Color.white
-                            .ignoresSafeArea()
-                            .transition(.opacity)
-                            .allowsHitTesting(false)
+                        if !visionManager.detectedSubjects.isEmpty {
+                            BoundingBoxView(subjects: visionManager.detectedSubjects)
+                        }
+
+                        // Capture flash animation
+                        if cameraManager.showCaptureFlash {
+                            Color.white
+                                .transition(.opacity)
+                                .allowsHitTesting(false)
+                        }
                     }
+                    .frame(width: screenWidth, height: previewHeight)
+                    .clipped()
+                    .position(x: screenWidth / 2, y: geo.size.height / 2)
                 }
                 .ignoresSafeArea()
             } else {

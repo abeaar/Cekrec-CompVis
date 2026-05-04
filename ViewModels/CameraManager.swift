@@ -27,6 +27,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
 
     
     private let sessionQueue = DispatchQueue(label: "com.customcamera.sessionQueue")
+    private let videoOutputQueue = DispatchQueue(label: "com.customcamera.videoOutputQueue", qos: .userInitiated)
     
     override init() {
         super.init()
@@ -94,9 +95,24 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             }
             
             if self.session.canAddOutput(self.videoOutput) {
-                self.videoOutput.setSampleBufferDelegate(self, queue: self.sessionQueue)
+                self.videoOutput.videoSettings = [
+                    kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
+                ]
                 self.videoOutput.alwaysDiscardsLateVideoFrames = true
+                self.videoOutput.setSampleBufferDelegate(self, queue: self.videoOutputQueue)
                 self.session.addOutput(self.videoOutput)
+                
+                if let connection = self.videoOutput.connection(with: .video) {
+                    if #available(iOS 17.0, *) {
+                        if connection.isVideoRotationAngleSupported(90) {
+                            connection.videoRotationAngle = 90
+                        }
+                    } else {
+                        if connection.isVideoOrientationSupported {
+                            connection.videoOrientation = .portrait
+                        }
+                    }
+                }
             }
             
             self.session.commitConfiguration()

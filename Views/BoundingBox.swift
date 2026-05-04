@@ -16,8 +16,7 @@ struct BoundingBoxView: View {
             ForEach(subjects) { subject in
                 let screenRect = VisionManager.convertToScreenRect(
                     normalizedRect: subject.normalizedRect,
-                    viewSize: viewSize,
-                    sourceImageSize: subject.sourceImageSize
+                    viewSize: viewSize
                 )
 
                 BoundingBoxShape(rect: screenRect, cornerRadius: cornerRadius)
@@ -93,13 +92,11 @@ struct CornerBrackets: Shape {
         BoundingBoxView(subjects: [
             DetectedSubject(
                 normalizedRect: CGRect(x: 0.2, y: 0.3, width: 0.3, height: 0.5),
-                confidence: 0.95,
-                sourceImageSize: CGSize(width: 1080, height: 1920)
+                confidence: 0.95
             ),
             DetectedSubject(
                 normalizedRect: CGRect(x: 0.6, y: 0.4, width: 0.25, height: 0.4),
-                confidence: 0.85,
-                sourceImageSize: CGSize(width: 1080, height: 1920)
+                confidence: 0.85
             )
         ])
     }
