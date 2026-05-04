@@ -9,9 +9,7 @@ protocol CameraFrameDelegate: AnyObject {
 }
 
 final class VisionManager: ObservableObject {
-
     @Published var detectedSubjects: [DetectedSubject] = []
-
     private let visionQueue = DispatchQueue(
         label: "com.cekrec.vision.processing",
         qos: .userInitiated
@@ -20,7 +18,6 @@ final class VisionManager: ObservableObject {
     private var isProcessing = false
     private lazy var humanDetectionRequest: VNDetectHumanRectanglesRequest = {
         let request = VNDetectHumanRectanglesRequest()
-        // Allow detection of up to 10 humans in a single frame.
         request.upperBodyOnly = false
         return request
     }()
@@ -48,21 +45,20 @@ final class VisionManager: ObservableObject {
             do {
                 try requestHandler.perform([self.humanDetectionRequest])
 
-                // --- Extract results ---
                 guard let results = self.humanDetectionRequest.results else {
                     self.publishSubjects([])
                     return
                 }
-
-                // --- Convert Vision observations to DetectedSubject models ---
-                let subjects = results.compactMap { observation -> DetectedSubject? in
-                    // Filter out low-confidence detections to reduce noise.
-                    guard observation.confidence > 0.5 else { return nil }
-                    return DetectedSubject(
-                        normalizedRect: observation.boundingBox,
-                        confidence: observation.confidence
-                    )
-                }
+                let subjects = results
+                    .filter { $0.confidence > 0.6 }
+                    .sorted { $0.confidence > $1.confidence }
+                    .prefix(1)
+                    .map { observation in
+                        DetectedSubject(
+                            normalizedRect: observation.boundingBox,
+                            confidence: observation.confidence
+                        )
+                    }
 
                 self.publishSubjects(subjects)
 
@@ -85,14 +81,12 @@ final class VisionManager: ObservableObject {
         let screenY      = (1 - normalizedRect.origin.y - normalizedRect.height) * viewSize.height
         let screenWidth  = normalizedRect.width                                 * viewSize.width
         let screenHeight = normalizedRect.height                                * viewSize.height
-
         return CGRect(x: screenX, y: screenY, width: screenWidth, height: screenHeight)
     }
 }
 
 extension VisionManager: CameraFrameDelegate {
 
-    /// Receives raw camera frames from `CameraManager` and forwards them for Vision processing.
     func cameraManager(_ manager: CameraManager, didOutput sampleBuffer: CMSampleBuffer) {
         processFrame(sampleBuffer)
     }

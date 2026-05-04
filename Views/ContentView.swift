@@ -5,7 +5,8 @@ import AVKit
 struct ContentView: View {
     @StateObject private var cameraManager = CameraManager()
     @StateObject private var visionManager = VisionManager()
-    
+    @State private var selectedGrid: GridType = .none
+
     private var flashIcon: String {
         switch cameraManager.flashMode {
         case .off:
@@ -17,13 +18,25 @@ struct ContentView: View {
         @unknown default:return "bolt.slash.fill"
         }
     }
-     
+
     var body: some View {
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
-                CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
-                BoundingBoxView(subjects: visionManager.detectedSubjects)
-                    .ignoresSafeArea()
+                ZStack {
+                    CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+
+                    if selectedGrid != .none {
+                        GridOverlayView(
+                            gridType: selectedGrid,
+                            subjects: visionManager.detectedSubjects
+                        )
+                    }
+
+                    if !visionManager.detectedSubjects.isEmpty {
+                        BoundingBoxView(subjects: visionManager.detectedSubjects)
+                    }
+                }
+                .ignoresSafeArea()
             } else {
                 VStack {
                     Text("apapun itu yabng bisa ditulis langsung")
@@ -45,9 +58,9 @@ struct ContentView: View {
                     }
                 }
             }
-            VStack{
-                HStack{
-                    Button{
+            VStack {
+                HStack {
+                    Button {
                         cameraManager.toggleFlash()
                     } label: {
                         Image(systemName: flashIcon)
@@ -55,10 +68,22 @@ struct ContentView: View {
                             .foregroundStyle(.white)
                             .padding()
                     }
+
+                    Spacer()
+
+                    Button {
+                        selectedGrid = selectedGrid.next
+                    } label: {
+                        Image(systemName: selectedGrid.iconName)
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                            .padding()
+                    }
                 }
+
                 Spacer()
-                
-                Button{
+
+                Button {
                     cameraManager.capturePhoto()
                 } label: {
                     Circle()
@@ -70,10 +95,9 @@ struct ContentView: View {
                                 .frame(width : 60, height: 60)
                         }
                 }
-                .padding(.bottom,40)    
+                .padding(.bottom, 40)
             }
-            .sheet(item: $cameraManager.captureImage){ item in
-                
+            .sheet(item: $cameraManager.captureImage) { item in
                 PhotoPreviewView(item: item, onDismiss: {
                     cameraManager.captureImage = nil
                 })
