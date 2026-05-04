@@ -9,6 +9,11 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
     @Published var authorizationStatus: AVAuthorizationStatus = .notDetermined
     @Published var flashMode: AVCaptureDevice.FlashMode = .off
     @Published var zoomFactor: CGFloat = 1.0
+    
+    // Gallery state
+    @Published var capturedPhotos: [IdentifiableImage] = []
+    @Published var lastCapturedImage: UIImage?
+    @Published var showCaptureFlash: Bool = false
     private let minZoomFactor: CGFloat = 1.0
     private let maxZoomFactor: CGFloat = 5.0
     
@@ -133,7 +138,17 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
         //update UI on main thread
         DispatchQueue.main.async{
             [weak self] in
-            self?.captureImage = IdentifiableImage(image: uiImage)
+            guard let self = self else { return }
+            let identifiable = IdentifiableImage(image: uiImage)
+            self.captureImage = identifiable
+            self.lastCapturedImage = uiImage
+            self.capturedPhotos.insert(identifiable, at: 0)
+            
+            // Trigger flash animation
+            self.showCaptureFlash = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.showCaptureFlash = false
+            }
         }
     }
 

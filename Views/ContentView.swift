@@ -6,6 +6,7 @@ struct ContentView: View {
     @StateObject private var cameraManager = CameraManager()
     @StateObject private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
+    @State private var showGallery: Bool = false
 
     private var flashIcon: String {
         switch cameraManager.flashMode {
@@ -35,6 +36,14 @@ struct ContentView: View {
                     if !visionManager.detectedSubjects.isEmpty {
                         BoundingBoxView(subjects: visionManager.detectedSubjects)
                     }
+
+                    // Capture flash animation
+                    if cameraManager.showCaptureFlash {
+                        Color.white
+                            .ignoresSafeArea()
+                            .transition(.opacity)
+                            .allowsHitTesting(false)
+                    }
                 }
                 .ignoresSafeArea()
             } else {
@@ -58,7 +67,10 @@ struct ContentView: View {
                     }
                 }
             }
+
+            // Camera controls overlay
             VStack {
+                // Top bar: Flash + Grid
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -66,7 +78,8 @@ struct ContentView: View {
                         Image(systemName: flashIcon)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .padding()
+                            .frame(width: 36, height: 36)
+                            .glassEffect(in: .circle)
                     }
 
                     Spacer()
@@ -77,37 +90,70 @@ struct ContentView: View {
                         Image(systemName: selectedGrid.iconName)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .padding()
+                            .frame(width: 36, height: 36)
+                            .glassEffect(in: .circle)
                     }
                 }
+                .padding(.horizontal, 16)
 
                 Spacer()
 
-                Button {
-                    cameraManager.capturePhoto()
-                } label: {
-                    Circle()
-                        .strokeBorder(.white, lineWidth: 3)
-                        .frame(width: 70, height: 70)
-                        .overlay {
+                // Bottom bar: Thumbnail | Shutter | (placeholder for flip)
+                HStack(alignment: .center) {
+                    // Gallery thumbnail
+                    GalleryThumbnailButton(
+                        lastImage: cameraManager.lastCapturedImage,
+                        photoCount: cameraManager.capturedPhotos.count,
+                        action: {
+                            if !cameraManager.capturedPhotos.isEmpty {
+                                showGallery = true
+                            }
+                        }
+                    )
+                    .frame(width: 70, alignment: .center)
+
+                    Spacer()
+
+                    // Shutter button
+                    Button {
+                        cameraManager.capturePhoto()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(.white.opacity(0.15))
+                                .frame(width: 78, height: 78)
+                                .glassEffect(in: .circle)
+
                             Circle()
                                 .fill(.white)
-                                .frame(width : 60, height: 60)
+                                .frame(width: 62, height: 62)
                         }
+                    }
+                    .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
+
+                    Spacer()
+
+                    // Spacer for symmetry (future: camera flip button)
+                    Color.clear
+                        .frame(width: 70, height: 54)
                 }
-                .padding(.bottom, 40)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 30)
             }
-            .sheet(item: $cameraManager.captureImage) { item in
-                PhotoPreviewView(item: item, onDismiss: {
-                    cameraManager.captureImage = nil
-                })
+
+            // Full-screen gallery
+            .fullScreenCover(isPresented: $showGallery) {
+                GalleryPreviewView(
+                    cameraManager: cameraManager,
+                    isPresented: $showGallery
+                )
             }
         }
         .onAppear {
             cameraManager.frameDelegate = visionManager
             cameraManager.checkAuthorization()
         }
-        .padding()
+        .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
     }
 }
 
