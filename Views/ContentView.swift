@@ -4,6 +4,7 @@ import AVKit
 
 struct ContentView: View {
     @StateObject private var cameraManager = CameraManager()
+    @StateObject private var visionManager = VisionManager()
     
     private var flashIcon: String {
         switch cameraManager.flashMode {
@@ -20,7 +21,8 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
-                CameraPreview(session : cameraManager.session, cameraManager: cameraManager)
+                CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                BoundingBoxView(subjects: visionManager.detectedSubjects)
                     .ignoresSafeArea()
             } else {
                 VStack {
@@ -78,6 +80,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            cameraManager.frameDelegate = visionManager
             cameraManager.checkAuthorization()
         }
         .padding()

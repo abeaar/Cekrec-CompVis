@@ -3,7 +3,7 @@ import AVFoundation
 import SwiftUI
 import Combine
 
-class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate {
+class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate  {
     @Published var captureImage : IdentifiableImage?
     @Published var isSessionRunning = false
     @Published var authorizationStatus: AVAuthorizationStatus = .notDetermined
@@ -12,11 +12,14 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
     private let minZoomFactor: CGFloat = 1.0
     private let maxZoomFactor: CGFloat = 5.0
     
-    
+    weak var frameDelegate: CameraFrameDelegate?
+
     let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
+    private let videoOutput = AVCaptureVideoDataOutput()
     private var currentInput: AVCaptureDeviceInput?
     private var isSessionConfigured = false
+
     
     private let sessionQueue = DispatchQueue(label: "com.customcamera.sessionQueue")
     
@@ -85,6 +88,12 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                 self.photoOutput.maxPhotoQualityPrioritization = .quality
             }
             
+            if self.session.canAddOutput(self.videoOutput) {
+                self.videoOutput.setSampleBufferDelegate(self, queue: self.sessionQueue)
+                self.videoOutput.alwaysDiscardsLateVideoFrames = true
+                self.session.addOutput(self.videoOutput)
+            }
+            
             self.session.commitConfiguration()
             self.isSessionConfigured = true
             self.session.startRunning()
@@ -94,6 +103,8 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             }
         }
     }
+    
+    
     func capturePhoto() {
         sessionQueue.async {
             [weak self] in
