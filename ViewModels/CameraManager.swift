@@ -188,27 +188,38 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                 .off
         }
     }
-    func zoom(factor: CGFloat){
+    func zoom(factor: CGFloat) {
         sessionQueue.async {
             [weak self] in
             guard let self = self,
-                  let device = self.currentInput?.device else {return}
+                  let device = self.currentInput?.device else { return }
             
             do {
                 try device.lockForConfiguration()
-                    //clamp
-                let clampedView = max(self.minZoomFactor, min(factor,min(self.maxZoomFactor, device.activeFormat.videoMaxZoomFactor)))
-                device.videoZoomFactor = clampedView
+                
+                let clamped = max(
+                    self.minZoomFactor,
+                    min(factor, min(self.maxZoomFactor, device.activeFormat.videoMaxZoomFactor))
+                )
+                
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(0.25)
+                device.ramp(toVideoZoomFactor: clamped, withRate: 5.0)
+                CATransaction.commit()
+                
                 DispatchQueue.main.async {
-                    self.zoomFactor = clampedView
+                    self.zoomFactor = clamped
                 }
+                
                 device.unlockForConfiguration()
-            }
-            catch{
-                print("Zoom error\(error.localizedDescription)")
+            } catch {
+                print("Zoom error \(error.localizedDescription)")
             }
         }
     }
+    func setZoom(_ factor: CGFloat) {
+         zoom(factor: factor)
+     }
 }
 
 

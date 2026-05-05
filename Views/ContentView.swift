@@ -7,7 +7,7 @@ struct ContentView: View {
     @StateObject private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
-
+    
     private var flashIcon: String {
         switch cameraManager.flashMode {
         case .off:
@@ -19,21 +19,21 @@ struct ContentView: View {
         @unknown default:return "bolt.slash.fill"
         }
     }
-
+    
     var body: some View {
-    // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
+        // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
                 GeometryReader { geo in
                     let screenWidth = geo.size.width
                     let previewHeight = screenWidth * (16.0 / 9.0)
-
-                //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
+                    
+                    //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
                     ZStack {
                         CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
                         if !visionManager.detectedSubjects.isEmpty {
                             BoundingBoxView(subjects: visionManager.detectedSubjects)
-                        }                
+                        }
                         if selectedGrid != .none {
                             GridOverlayView(
                                 gridType: selectedGrid,
@@ -52,7 +52,7 @@ struct ContentView: View {
                 }
                 .ignoresSafeArea()
             } else {
-            //UI callback semisal belum authorisasi Camera dari user
+                //UI callback semisal belum authorisasi Camera dari user
                 VStack {
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
@@ -74,7 +74,7 @@ struct ContentView: View {
             }
             // Vstack untuk top Bar dan Bottom Bar untuk mengelompokan button dan elemen lainnya
             VStack {
-                // top bar untuk flash dan grid 
+                // top bar untuk flash dan grid
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -85,9 +85,9 @@ struct ContentView: View {
                             .frame(width: 36, height: 36)
                             .glassEffect(in: .circle)
                     }
-
+                    
                     Spacer()
-
+                    
                     Button {
                         selectedGrid = selectedGrid.next
                     } label: {
@@ -99,65 +99,79 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal, 16)
-
+                
                 Spacer()
-
-                // Bottom bar untuk Gallery thumbnail dan Shutter button
-                HStack(alignment: .center) {
-                    // Gallery thumbnail
-                    GalleryThumbnailButton(
-                        lastImage: cameraManager.lastCapturedImage,
-                        photoCount: cameraManager.capturedPhotos.count,
-                        action: {
-                            if !cameraManager.capturedPhotos.isEmpty {
-                                showGallery = true
+                
+                VStack(alignment: .center) {
+                    ZoomControlView(cameraManager: cameraManager)
+                    
+                    HStack(alignment: .center) {
+                        // Gallery thumbnail
+                        GalleryThumbnailButton(
+                            lastImage: cameraManager.lastCapturedImage,
+                            photoCount: cameraManager.capturedPhotos.count,
+                            action: {
+                                if !cameraManager.capturedPhotos.isEmpty {
+                                    showGallery = true
+                                }
+                            }
+                        )
+                        .frame(width: 70, alignment: .center)
+                        
+                        Spacer()
+                        
+                        // Shutter button
+                        Button {
+                            cameraManager.capturePhoto()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(.white.opacity(0.15))
+                                    .frame(width: 78, height: 78)
+                                    .glassEffect(in: .circle)
+                                
+                                Circle()
+                                    .fill(.white)
+                                    .frame(width: 62, height: 62)
                             }
                         }
-                    )
-                    .frame(width: 70, alignment: .center)
-
-                    Spacer()
-
-                    // Shutter button
-                    Button {
-                        cameraManager.capturePhoto()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(.white.opacity(0.15))
-                                .frame(width: 78, height: 78)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
+                        
+                        Spacer()
+                        
+                        // Composition Button
+                        Button {
+                            selectedGrid = selectedGrid.next
+                        } label: {
+                            Image(systemName: selectedGrid.iconName)
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 45, height: 45)
                                 .glassEffect(in: .circle)
-
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 62, height: 62)
+                                .overlay(
+                                    Circle()
+                                        .fill(.black.opacity(0.3))
+                                )
                         }
+                        .frame(width: 70)
                     }
-                    .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
-
-                    Spacer()
-
-                    // Spacer for symmetry (future: camera flip button)
-                    Color.clear
-                        .frame(width: 70, height: 54)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 30)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 30)
+                }.frame(maxWidth: .infinity)
+                // Full-screen gallery
+                    .fullScreenCover(isPresented: $showGallery) {
+                        GalleryPreviewView(
+                            cameraManager: cameraManager,
+                            isPresented: $showGallery
+                        )
+                    }
             }
-
-            // Full-screen gallery
-            .fullScreenCover(isPresented: $showGallery) {
-                GalleryPreviewView(
-                    cameraManager: cameraManager,
-                    isPresented: $showGallery
-                )
+            .onAppear {
+                cameraManager.frameDelegate = visionManager
+                cameraManager.checkAuthorization()
             }
+            .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
         }
-        .onAppear {
-            cameraManager.frameDelegate = visionManager
-            cameraManager.checkAuthorization()
-        }
-        .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
     }
 }
 
