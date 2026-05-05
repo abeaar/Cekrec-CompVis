@@ -163,6 +163,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
         DispatchQueue.main.async{
             [weak self] in
             guard let self = self else { return }
+            
             let identifiable = IdentifiableImage(image: uiImage)
             self.captureImage = identifiable
             self.lastCapturedImage = uiImage

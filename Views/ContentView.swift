@@ -138,7 +138,6 @@ struct ContentView: View {
                         .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
                         
                         Spacer()
-                        
                         // Composition Button
                         Button {
                             selectedGrid = selectedGrid.next
