@@ -21,34 +21,39 @@ struct ContentView: View {
     }
 
     var body: some View {
+    // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
-                ZStack {
-                    CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                GeometryReader { geo in
+                    let screenWidth = geo.size.width
+                    let previewHeight = screenWidth * (16.0 / 9.0)
 
-                    if selectedGrid != .none {
-                        GridOverlayView(
-                            gridType: selectedGrid,
-                            subjects: visionManager.detectedSubjects
-                        )
+                //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
+                    ZStack {
+                        CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                        if !visionManager.detectedSubjects.isEmpty {
+                            BoundingBoxView(subjects: visionManager.detectedSubjects)
+                        }                
+                        if selectedGrid != .none {
+                            GridOverlayView(
+                                gridType: selectedGrid,
+                                subjects: visionManager.detectedSubjects
+                            )
+                        }
+                        if cameraManager.showCaptureFlash {
+                            Color.white
+                                .transition(.opacity)
+                                .allowsHitTesting(false)
+                        }
                     }
-
-                    if !visionManager.detectedSubjects.isEmpty {
-                        BoundingBoxView(subjects: visionManager.detectedSubjects)
-                    }
-
-                    // Capture flash animation
-                    if cameraManager.showCaptureFlash {
-                        Color.white
-                            .ignoresSafeArea()
-                            .transition(.opacity)
-                            .allowsHitTesting(false)
-                    }
+                    .frame(width: screenWidth, height: previewHeight)
+                    .clipped()
+                    .position(x: screenWidth / 2, y: geo.size.height / 2)
                 }
                 .ignoresSafeArea()
             } else {
+            //UI callback semisal belum authorisasi Camera dari user
                 VStack {
-                    Text("apapun itu yabng bisa ditulis langsung")
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.gray)
@@ -67,10 +72,9 @@ struct ContentView: View {
                     }
                 }
             }
-
-            // Camera controls overlay
+            // Vstack untuk top Bar dan Bottom Bar untuk mengelompokan button dan elemen lainnya
             VStack {
-                // Top bar: Flash + Ratio
+                // top bar untuk flash dan grid 
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -102,63 +106,47 @@ struct ContentView: View {
 
                 Spacer()
 
-                // Bottom bar: Thumbnail | Shutter
-                VStack(alignment: .center) {
-                    ZoomControlView(cameraManager: cameraManager)
-                    
-                    HStack(alignment: .center) {
-                        // Gallery thumbnail
-                        GalleryThumbnailButton(
-                            lastImage: cameraManager.lastCapturedImage,
-                            photoCount: cameraManager.capturedPhotos.count,
-                            action: {
-                                if !cameraManager.capturedPhotos.isEmpty {
-                                    showGallery = true
-                                }
-                            }
-                        )
-                        .frame(width: 70, alignment: .center)
-                        
-                        Spacer()
-                        
-                        // Shutter button
-                        Button {
-                            cameraManager.capturePhoto()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(.white.opacity(0.15))
-                                    .frame(width: 78, height: 78)
-                                    .glassEffect(in: .circle)
-                                
-                                Circle()
-                                    .fill(.white)
-                                    .frame(width: 62, height: 62)
+                // Bottom bar untuk Gallery thumbnail dan Shutter button
+                HStack(alignment: .center) {
+                    // Gallery thumbnail
+                    GalleryThumbnailButton(
+                        lastImage: cameraManager.lastCapturedImage,
+                        photoCount: cameraManager.capturedPhotos.count,
+                        action: {
+                            if !cameraManager.capturedPhotos.isEmpty {
+                                showGallery = true
                             }
                         }
-                        .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
-                        
-                        Spacer()
-                        
-                        // Composition Button
-                        Button {
-                            selectedGrid = selectedGrid.next
-                        } label: {
-                            Image(systemName: selectedGrid.iconName)
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .frame(width: 45, height: 45)
+                    )
+                    .frame(width: 70, alignment: .center)
+
+                    Spacer()
+
+                    // Shutter button
+                    Button {
+                        cameraManager.capturePhoto()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(.white.opacity(0.15))
+                                .frame(width: 78, height: 78)
                                 .glassEffect(in: .circle)
-                                .overlay(
-                                    Circle()
-                                        .fill(.black.opacity(0.3))
-                                )
+
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 62, height: 62)
                         }
-                        .frame(width: 70)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 30)
-                }.frame(maxWidth: .infinity)
+                    .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
+
+                    Spacer()
+
+                    // Spacer for symmetry (future: camera flip button)
+                    Color.clear
+                        .frame(width: 70, height: 54)
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 30)
             }
 
             // Full-screen gallery

@@ -60,8 +60,7 @@ struct GridOverlayView: View {
                 let isHit = subjects.contains { subject in
                     let screenRect = VisionManager.convertToScreenRect(
                         normalizedRect: subject.normalizedRect,
-                        viewSize: size,
-//                        sourceImageSize: subject.sourceImageSize
+                        viewSize: size
                     )
                     return screenRect.contains(point)
                 }
@@ -120,8 +119,7 @@ struct GridOverlayView: View {
         return subjects.contains { subject in
             let rect = VisionManager.convertToScreenRect(
                 normalizedRect: subject.normalizedRect,
-                viewSize: size,
-                sourceImageSize: subject.sourceImageSize
+                viewSize: size
             )
             let isInside  = rect.contains(center)
             let offsetX   = abs(rect.midX - centerX)
