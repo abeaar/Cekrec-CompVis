@@ -115,7 +115,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
           
           let settings = AVCapturePhotoSettings()
           settings.flashMode = self.flashMode
-          
+          //test github
           if self.photoOutput.isHighResolutionCaptureEnabled {
               settings.isHighResolutionPhotoEnabled = true
           }
