@@ -5,7 +5,7 @@ struct BoundingBoxView: View {
 
     private let fillColor   = Color.white.opacity(0.15)
     private let borderColor = Color.white.opacity(0.8)
-    private let borderWidth: CGFloat = 1.5
+    private let borderWidth : CGFloat = 1.5
 
     private let cornerRadius: CGFloat = 8
 

@@ -18,7 +18,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
     private let maxZoomFactor: CGFloat = 5.0
     
     weak var frameDelegate: CameraFrameDelegate?
-
+    // main capture session handle
     let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
     private let videoOutput = AVCaptureVideoDataOutput()
@@ -45,7 +45,6 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                 DispatchQueue.main.async {
                     self?.authorizationStatus = granted ? .authorized : .denied
                 }
-                
                 if granted {
                     self?.setupSession()
                 }
@@ -60,11 +59,13 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             }
         }
     }
-    
+
     private func setupSession() {
+        // setup capture session 
         sessionQueue.async { [weak self] in
+        // maksa setup code untuk berjalan di background thread berbeda (sessionQueue) biar gak ganggu UI
             guard let self = self else { return }
-            
+            // if session sudah berjalan maka tidak perlu setup lagi
             if self.isSessionConfigured {
                 if !self.session.isRunning {
                     self.session.startRunning()
@@ -78,12 +79,15 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             self.session.beginConfiguration()
             self.session.sessionPreset = .photo
             
-            guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back), let input = try? AVCaptureDeviceInput(device: camera) else {
+            // ambil device camera belakang sebagai input
+            guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+
+            let input = try? AVCaptureDeviceInput(device: camera) else {
                 print("failed to access camera")
                 self.session.commitConfiguration()
                 return
             }
-            
+            // input dioper ke if else dibawah
             if self.session.canAddInput(input) {
                 self.session.addInput(input)
                 self.currentInput = input
@@ -94,10 +98,12 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                 self.photoOutput.maxPhotoQualityPrioritization = .quality
             }
             
+            // ini buat video output ke Vision manager, Input video diambil dari output photo
             if self.session.canAddOutput(self.videoOutput) {
                 self.videoOutput.videoSettings = [
                     kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA
                 ]
+                // maksa frame camera dari output diubah jadi color format 32BGRA untuk vision manager
                 self.videoOutput.alwaysDiscardsLateVideoFrames = true
                 self.videoOutput.setSampleBufferDelegate(self, queue: self.videoOutputQueue)
                 self.session.addOutput(self.videoOutput)
@@ -119,6 +125,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             self.isSessionConfigured = true
             self.session.startRunning()
             
+            // update UI state 
             DispatchQueue.main.async {
                 self.isSessionRunning = self.session.isRunning
             }
@@ -127,19 +134,20 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
     
     
     func capturePhoto() {
+        // maksa setup code untuk berjalan di background thread berbeda (sessionQueue) biar gak ganggu UI
         sessionQueue.async {
             [weak self] in
+            // if session sudah berjalan maka tidak perlu setup lagi
             guard let self = self else {return}
-            
             let settings = AVCapturePhotoSettings()
             settings.flashMode = self.flashMode
-            
             if self.photoOutput.isHighResolutionCaptureEnabled {
                 settings.isHighResolutionPhotoEnabled = true
             }
             self.photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
+    
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
             print("photo capture error \(error.localizedDescription)")

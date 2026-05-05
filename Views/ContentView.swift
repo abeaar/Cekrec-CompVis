@@ -21,27 +21,25 @@ struct ContentView: View {
     }
 
     var body: some View {
+    // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
                 GeometryReader { geo in
                     let screenWidth = geo.size.width
                     let previewHeight = screenWidth * (16.0 / 9.0)
 
+                //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
                     ZStack {
                         CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
-
+                        if !visionManager.detectedSubjects.isEmpty {
+                            BoundingBoxView(subjects: visionManager.detectedSubjects)
+                        }                
                         if selectedGrid != .none {
                             GridOverlayView(
                                 gridType: selectedGrid,
                                 subjects: visionManager.detectedSubjects
                             )
                         }
-
-                        if !visionManager.detectedSubjects.isEmpty {
-                            BoundingBoxView(subjects: visionManager.detectedSubjects)
-                        }
-
-                        // Capture flash animation
                         if cameraManager.showCaptureFlash {
                             Color.white
                                 .transition(.opacity)
@@ -54,6 +52,7 @@ struct ContentView: View {
                 }
                 .ignoresSafeArea()
             } else {
+            //UI callback semisal belum authorisasi Camera dari user
                 VStack {
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
@@ -73,10 +72,9 @@ struct ContentView: View {
                     }
                 }
             }
-
-            // Camera controls overlay
+            // Vstack untuk top Bar dan Bottom Bar untuk mengelompokan button dan elemen lainnya
             VStack {
-                // Top bar: Flash + Grid
+                // top bar untuk flash dan grid 
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -104,7 +102,7 @@ struct ContentView: View {
 
                 Spacer()
 
-                // Bottom bar: Thumbnail | Shutter | (placeholder for flip)
+                // Bottom bar untuk Gallery thumbnail dan Shutter button
                 HStack(alignment: .center) {
                     // Gallery thumbnail
                     GalleryThumbnailButton(
