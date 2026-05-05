@@ -70,7 +70,7 @@ struct ContentView: View {
 
             // Camera controls overlay
             VStack {
-                // Top bar: Flash + Grid
+                // Top bar: Flash + Ratio
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -78,8 +78,12 @@ struct ContentView: View {
                         Image(systemName: flashIcon)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
+                            .overlay(
+                                Circle()
+                                    .fill(.black.opacity(0.3))
+                            )
                     }
 
                     Spacer()
@@ -90,55 +94,71 @@ struct ContentView: View {
                         Image(systemName: selectedGrid.iconName)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 30)
 
                 Spacer()
 
-                // Bottom bar: Thumbnail | Shutter | (placeholder for flip)
-                HStack(alignment: .center) {
-                    // Gallery thumbnail
-                    GalleryThumbnailButton(
-                        lastImage: cameraManager.lastCapturedImage,
-                        photoCount: cameraManager.capturedPhotos.count,
-                        action: {
-                            if !cameraManager.capturedPhotos.isEmpty {
-                                showGallery = true
+                // Bottom bar: Thumbnail | Shutter
+                VStack(alignment: .center) {
+                    ZoomControlView(cameraManager: cameraManager)
+                    
+                    HStack(alignment: .center) {
+                        // Gallery thumbnail
+                        GalleryThumbnailButton(
+                            lastImage: cameraManager.lastCapturedImage,
+                            photoCount: cameraManager.capturedPhotos.count,
+                            action: {
+                                if !cameraManager.capturedPhotos.isEmpty {
+                                    showGallery = true
+                                }
+                            }
+                        )
+                        .frame(width: 70, alignment: .center)
+                        
+                        Spacer()
+                        
+                        // Shutter button
+                        Button {
+                            cameraManager.capturePhoto()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(.white.opacity(0.15))
+                                    .frame(width: 78, height: 78)
+                                    .glassEffect(in: .circle)
+                                
+                                Circle()
+                                    .fill(.white)
+                                    .frame(width: 62, height: 62)
                             }
                         }
-                    )
-                    .frame(width: 70, alignment: .center)
-
-                    Spacer()
-
-                    // Shutter button
-                    Button {
-                        cameraManager.capturePhoto()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(.white.opacity(0.15))
-                                .frame(width: 78, height: 78)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
+                        
+                        Spacer()
+                        
+                        // Composition Button
+                        Button {
+                            selectedGrid = selectedGrid.next
+                        } label: {
+                            Image(systemName: selectedGrid.iconName)
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 45, height: 45)
                                 .glassEffect(in: .circle)
-
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 62, height: 62)
+                                .overlay(
+                                    Circle()
+                                        .fill(.black.opacity(0.3))
+                                )
                         }
+                        .frame(width: 70)
                     }
-                    .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
-
-                    Spacer()
-
-                    // Spacer for symmetry (future: camera flip button)
-                    Color.clear
-                        .frame(width: 70, height: 54)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 30)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 30)
+                }.frame(maxWidth: .infinity)
             }
 
             // Full-screen gallery
