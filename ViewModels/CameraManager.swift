@@ -1,4 +1,3 @@
-
 import AVFoundation
 import SwiftUI
 import Combine
@@ -225,6 +224,6 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
 
 
 struct IdentifiableImage: Identifiable {
-    let id = UUID()
-    let image:UIImage
+  let id = UUID()
+  let image:UIImage
 }

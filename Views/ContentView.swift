@@ -46,14 +46,12 @@ struct ContentView: View {
                                 .allowsHitTesting(false)
                         }
                     }
-                    .frame(width: screenWidth, height: previewHeight)
-                    .clipped()
-                    .position(x: screenWidth / 2, y: geo.size.height / 2)
                 }
                 .ignoresSafeArea()
             } else {
                 //UI callback semisal belum authorisasi Camera dari user
                 VStack {
+                    Text("apapun itu yabng bisa ditulis langsung")
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.gray)
@@ -72,7 +70,8 @@ struct ContentView: View {
                     }
                 }
             }
-            // Vstack untuk top Bar dan Bottom Bar untuk mengelompokan button dan elemen lainnya
+
+            // Camera controls overlay
             VStack {
                 // top bar untuk flash dan grid
                 HStack {
@@ -82,8 +81,12 @@ struct ContentView: View {
                         Image(systemName: flashIcon)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
+                            .overlay(
+                                Circle()
+                                    .fill(.black.opacity(0.3))
+                            )
                     }
                     
                     Spacer()
@@ -94,7 +97,7 @@ struct ContentView: View {
                         Image(systemName: selectedGrid.iconName)
                             .font(.title2)
                             .foregroundStyle(.white)
-                            .frame(width: 36, height: 36)
+                            .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
                     }
                 }
