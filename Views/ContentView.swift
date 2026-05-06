@@ -3,8 +3,8 @@ import SwiftUI
 import AVKit
 
 struct ContentView: View {
-    @StateObject private var cameraManager = CameraManager()
-    @StateObject private var visionManager = VisionManager()
+    @State private var cameraManager = CameraManager()
+    @State private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
 

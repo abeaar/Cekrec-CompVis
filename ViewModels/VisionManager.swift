@@ -1,22 +1,23 @@
 import Vision
 import AVFoundation
 import CoreImage
-import Combine
+import Observation
 
 
 protocol CameraFrameDelegate: AnyObject {
     func cameraManager(_ manager: CameraManager, didOutput sampleBuffer: CMSampleBuffer)
 }
 
-final class VisionManager: ObservableObject {
-    @Published var detectedSubjects: [DetectedSubject] = []
+@Observable
+final class VisionManager {
+    var detectedSubjects: [DetectedSubject] = []
     private let visionQueue = DispatchQueue(
         label: "com.cekrec.vision.processing",
         qos: .userInitiated
     )
 
     private var isProcessing = false
-    private lazy var humanDetectionRequest: VNDetectHumanRectanglesRequest = {
+    private var humanDetectionRequest: VNDetectHumanRectanglesRequest = {
         let request = VNDetectHumanRectanglesRequest()
         request.upperBodyOnly = false
         return request
