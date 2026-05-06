@@ -16,7 +16,12 @@ struct CameraPreview: UIViewRepresentable {
         
         context.coordinator.previewLayer = previewLayer
         
+        // pinch gesture kudu bantu preview camera bisa detect pinch
+        //coordinator ini kayak bridge antara UIKit sama SwiftUI, dia jadi target tuh maksudnya jadi yang nerima eventnya
+        // action berarti nanti kalau ada event pinch, jalanin action handle pinch (functionnya ada di bawah)
         let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
+        
+        // gesture recognizer kudu penting buat bantu dia recognize pinch dari user
         view.addGestureRecognizer(pinchGesture)
         
         context.coordinator.cameraManager = cameraManager
