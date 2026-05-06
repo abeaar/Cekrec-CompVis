@@ -7,6 +7,9 @@ struct ContentView: View {
     @StateObject private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
+
+    @GestureState private var pinchZoomFactor: CGFloat = 1.0
+    @State private var currentZoomFactor: CGFloat = 1.0
     
     private var flashIcon: String {
         switch cameraManager.flashMode {
@@ -27,10 +30,25 @@ struct ContentView: View {
                 GeometryReader { geo in
                     let screenWidth = geo.size.width
                     let previewHeight = screenWidth * (16.0 / 9.0)
-                    
                     //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
                     ZStack {
+                        // karena pake UIViewRepresentable secara otomatis nge call func makeUIView, makeCoordinator. 
                         CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                            .gesture(
+                            MagnifyGesture()
+                                .updating($pinchZoomFactor) { value, state, _ in
+                                    // ini bakal run terus selama jari nge pinch
+                                    state = value.magnification
+                                    let newZoom = currentZoomFactor * state
+                                    cameraManager.zoom(factor: newZoom)
+                                }
+                                .onEnded { value in
+                                    // This runs the millisecond you lift your fingers
+                                    // Save the final zoom level to memory!
+                                    currentZoomFactor = currentZoomFactor * value.magnification
+                                }
+                        )
+                        
                         if !visionManager.detectedSubjects.isEmpty {
                             BoundingBoxView(subjects: visionManager.detectedSubjects)
                         }
