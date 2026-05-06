@@ -10,14 +10,13 @@ class CameraManager : NSObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDat
     var flashMode: AVCaptureDevice.FlashMode = .off
     var zoomFactor: CGFloat = 1.0
     
-    // Gallery state
     var capturedPhotos: [IdentifiableImage] = []
     var lastCapturedImage: UIImage?
     var showCaptureFlash: Bool = false
     private let minZoomFactor: CGFloat = 1.0
     private let maxZoomFactor: CGFloat = 5.0
     
-    weak var frameDelegate: CameraFrameDelegate?
+    weak var visionManager: VisionManager?
     // main capture session handle
     let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
@@ -182,7 +181,7 @@ class CameraManager : NSObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDat
         from connection: AVCaptureConnection
     ) {
         autoreleasepool {
-            frameDelegate?.cameraManager(self, didOutput: sampleBuffer)
+            visionManager?.processFrame(sampleBuffer)
         }
     }
 

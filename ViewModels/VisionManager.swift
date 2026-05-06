@@ -3,11 +3,6 @@ import AVFoundation
 import CoreImage
 import Observation
 
-
-protocol CameraFrameDelegate: AnyObject {
-    func cameraManager(_ manager: CameraManager, didOutput sampleBuffer: CMSampleBuffer)
-}
-
 @Observable
 final class VisionManager {
     var detectedSubjects: [DetectedSubject] = []
@@ -89,12 +84,5 @@ final class VisionManager {
             width: screenWidth,
             height: screenHeight
         )
-    }
-}
-
-extension VisionManager: CameraFrameDelegate {
-
-    func cameraManager(_ manager: CameraManager, didOutput sampleBuffer: CMSampleBuffer) {
-        processFrame(sampleBuffer)
     }
 }

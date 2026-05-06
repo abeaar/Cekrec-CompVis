@@ -1,8 +1,5 @@
 import SwiftUI
 
-/// A rounded thumbnail button showing the last captured photo,
-/// positioned at the bottom-left of the camera interface.
-/// Styled with iOS 26 Liquid Glass aesthetic.
 struct GalleryThumbnailButton: View {
     let lastImage: UIImage?
     let photoCount: Int

@@ -91,13 +91,13 @@ struct ContentView: View {
 
             // Camera controls overlay
             VStack {
-                // top bar untuk flash dan grid
+                // top bar untuk flash dan ratio
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
                     } label: {
                         Image(systemName: flashIcon)
-                            .font(.title2)
+                            .font(.caption)
                             .foregroundStyle(.white)
                             .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
@@ -110,10 +110,9 @@ struct ContentView: View {
                     Spacer()
                     
                     Button {
-                        selectedGrid = selectedGrid.next
                     } label: {
-                        Image(systemName: selectedGrid.iconName)
-                            .font(.title2)
+                        Text("16:9")
+                            .font(.caption)
                             .foregroundStyle(.white)
                             .frame(width: 40, height: 40)
                             .glassEffect(in: .circle)
@@ -125,7 +124,6 @@ struct ContentView: View {
                 
                 VStack(alignment: .center) {
                     ZoomControlView(cameraManager: cameraManager)
-                    
                     HStack(alignment: .center) {
                         // Gallery thumbnail
                         GalleryThumbnailButton(
@@ -187,7 +185,7 @@ struct ContentView: View {
                     }
             }
             .onAppear {
-                cameraManager.frameDelegate = visionManager
+                cameraManager.visionManager = visionManager
                 cameraManager.checkAuthorization()
             }
             .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
