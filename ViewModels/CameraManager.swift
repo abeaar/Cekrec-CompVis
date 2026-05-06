@@ -195,8 +195,11 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                   let device = self.currentInput?.device else { return }
             
             do {
+                // dilock dulu current settings si kamera sebelum ada perubahan
                 try device.lockForConfiguration()
                 
+                // dibatasin zoomnya supaya ga melebihi yang device bisa
+                // di atas ada di set min zoom 1, max zoom 5, jadi zoomnya akan di antara range ini
                 let clamped = max(
                     self.minZoomFactor,
                     min(factor, min(self.maxZoomFactor, device.activeFormat.videoMaxZoomFactor))
@@ -204,9 +207,12 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
                 
                 CATransaction.begin()
                 CATransaction.setAnimationDuration(0.25)
+                // ini bikin zoomnya jadi ada effect smooth ngezoom itu, gliding istilahnya
+                // withRate itu speed animasi zoomnya
                 device.ramp(toVideoZoomFactor: clamped, withRate: 5.0)
                 CATransaction.commit()
                 
+                // karena zoom factor itu published variable, semua UI yang otomatis akan di re render
                 DispatchQueue.main.async {
                     self.zoomFactor = clamped
                 }
@@ -217,6 +223,7 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             }
         }
     }
+    
     func setZoom(_ factor: CGFloat) {
          zoom(factor: factor)
      }
