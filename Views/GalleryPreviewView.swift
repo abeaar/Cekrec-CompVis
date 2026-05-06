@@ -1,10 +1,3 @@
-//
-//  GalleryPreviewView.swift
-//  Cekrec
-//
-//  Created by Antigravity on 04/05/26.
-//
-
 import SwiftUI
 
 /// Full-screen immersive photo gallery with iOS 26 Liquid Glass controls.

@@ -7,7 +7,7 @@ struct ContentView: View {
     @StateObject private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
-
+    
     private var flashIcon: String {
         switch cameraManager.flashMode {
         case .off:
@@ -19,34 +19,37 @@ struct ContentView: View {
         @unknown default:return "bolt.slash.fill"
         }
     }
-
+    
     var body: some View {
+        // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
         ZStack {
             if cameraManager.authorizationStatus == .authorized {
-                ZStack {
-                    CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
-
-                    if selectedGrid != .none {
-                        GridOverlayView(
-                            gridType: selectedGrid,
-                            subjects: visionManager.detectedSubjects
-                        )
-                    }
-
-                    if !visionManager.detectedSubjects.isEmpty {
-                        BoundingBoxView(subjects: visionManager.detectedSubjects)
-                    }
-
-                    // Capture flash animation
-                    if cameraManager.showCaptureFlash {
-                        Color.white
-                            .ignoresSafeArea()
-                            .transition(.opacity)
-                            .allowsHitTesting(false)
+                GeometryReader { geo in
+                    let screenWidth = geo.size.width
+                    let previewHeight = screenWidth * (16.0 / 9.0)
+                    
+                    //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
+                    ZStack {
+                        CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                        if !visionManager.detectedSubjects.isEmpty {
+                            BoundingBoxView(subjects: visionManager.detectedSubjects)
+                        }
+                        if selectedGrid != .none {
+                            GridOverlayView(
+                                gridType: selectedGrid,
+                                subjects: visionManager.detectedSubjects
+                            )
+                        }
+                        if cameraManager.showCaptureFlash {
+                            Color.white
+                                .transition(.opacity)
+                                .allowsHitTesting(false)
+                        }
                     }
                 }
                 .ignoresSafeArea()
             } else {
+                //UI callback semisal belum authorisasi Camera dari user
                 VStack {
                     Text("apapun itu yabng bisa ditulis langsung")
                     Image(systemName: "camera.fill")
@@ -70,7 +73,7 @@ struct ContentView: View {
 
             // Camera controls overlay
             VStack {
-                // Top bar: Flash + Ratio
+                // top bar untuk flash dan grid
                 HStack {
                     Button {
                         cameraManager.toggleFlash()
@@ -85,9 +88,9 @@ struct ContentView: View {
                                     .fill(.black.opacity(0.3))
                             )
                     }
-
+                    
                     Spacer()
-
+                    
                     Button {
                         selectedGrid = selectedGrid.next
                     } label: {
@@ -98,11 +101,10 @@ struct ContentView: View {
                             .glassEffect(in: .circle)
                     }
                 }
-                .padding(.horizontal, 30)
-
+                .padding(.horizontal, 16)
+                
                 Spacer()
-
-                // Bottom bar: Thumbnail | Shutter
+                
                 VStack(alignment: .center) {
                     ZoomControlView(cameraManager: cameraManager)
                     
@@ -139,7 +141,6 @@ struct ContentView: View {
                         .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
                         
                         Spacer()
-                        
                         // Composition Button
                         Button {
                             selectedGrid = selectedGrid.next
@@ -159,21 +160,20 @@ struct ContentView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 30)
                 }.frame(maxWidth: .infinity)
+                // Full-screen gallery
+                    .fullScreenCover(isPresented: $showGallery) {
+                        GalleryPreviewView(
+                            cameraManager: cameraManager,
+                            isPresented: $showGallery
+                        )
+                    }
             }
-
-            // Full-screen gallery
-            .fullScreenCover(isPresented: $showGallery) {
-                GalleryPreviewView(
-                    cameraManager: cameraManager,
-                    isPresented: $showGallery
-                )
+            .onAppear {
+                cameraManager.frameDelegate = visionManager
+                cameraManager.checkAuthorization()
             }
+            .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
         }
-        .onAppear {
-            cameraManager.frameDelegate = visionManager
-            cameraManager.checkAuthorization()
-        }
-        .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
     }
 }
 

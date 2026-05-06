@@ -1,11 +1,3 @@
-//
-//  ZoomControlView.swift
-//  Cekrec
-//
-//  Created by Carolyn Santana on 05/05/26.
-//
-
-
 import SwiftUI
 
 struct ZoomControlView: View {

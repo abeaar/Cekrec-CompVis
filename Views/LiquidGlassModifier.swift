@@ -1,10 +1,3 @@
-//
-//  LiquidGlassModifier.swift
-//  Cekrec
-//
-//  Created by Antigravity on 04/05/26.
-//
-
 import SwiftUI
 
 // MARK: - Liquid Glass Bar
