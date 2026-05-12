@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ZoomControlView: View {
-    @ObservedObject var cameraManager: CameraManager
+    var cameraManager: CameraManager
     
     // preset zoom levels di buttonnya
     private let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0]

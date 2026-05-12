@@ -1,22 +1,22 @@
 import AVFoundation
 import SwiftUI
-import Combine
+import Observation
 
-class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate  {
-    @Published var captureImage : IdentifiableImage?
-    @Published var isSessionRunning = false
-    @Published var authorizationStatus: AVAuthorizationStatus = .notDetermined
-    @Published var flashMode: AVCaptureDevice.FlashMode = .off
-    @Published var zoomFactor: CGFloat = 1.0
+@Observable
+class CameraManager : NSObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDataOutputSampleBufferDelegate{
+    var captureImage : IdentifiableImage?
+    var isSessionRunning = false
+    var authorizationStatus: AVAuthorizationStatus = .notDetermined
+    var flashMode: AVCaptureDevice.FlashMode = .off
+    var zoomFactor: CGFloat = 1.0
     
-    // Gallery state
-    @Published var capturedPhotos: [IdentifiableImage] = []
-    @Published var lastCapturedImage: UIImage?
-    @Published var showCaptureFlash: Bool = false
+    var capturedPhotos: [IdentifiableImage] = []
+    var lastCapturedImage: UIImage?
+    var showCaptureFlash: Bool = false
     private let minZoomFactor: CGFloat = 1.0
     private let maxZoomFactor: CGFloat = 5.0
     
-    weak var frameDelegate: CameraFrameDelegate?
+    weak var visionManager: VisionManager?
     // main capture session handle
     let session = AVCaptureSession()
     private let photoOutput = AVCapturePhotoOutput()
@@ -175,6 +175,23 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             }
         }
     }
+    func captureOutput(
+        _ output: AVCaptureOutput,
+        didOutput sampleBuffer: CMSampleBuffer,
+        from connection: AVCaptureConnection
+    ) {
+        autoreleasepool {
+            visionManager?.processFrame(sampleBuffer)
+        }
+    }
+
+    func captureOutput(
+        _ output: AVCaptureOutput,
+        didDrop sampleBuffer: CMSampleBuffer,
+        from connection: AVCaptureConnection
+    ) {
+
+    }
 
     func toggleFlash(){
         flashMode = switch flashMode {
@@ -197,9 +214,12 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
             do {
                 // dilock dulu current settings si kamera sebelum ada perubahan
                 try device.lockForConfiguration()
+<<<<<<< HEAD
                 
                 // dibatasin zoomnya supaya ga melebihi yang device bisa
                 // di atas ada di set min zoom 1, max zoom 5, jadi zoomnya akan di antara range ini
+=======
+>>>>>>> main
                 let clamped = max(
                     self.minZoomFactor,
                     min(factor, min(self.maxZoomFactor, device.activeFormat.videoMaxZoomFactor))
@@ -229,8 +249,3 @@ class CameraManager : NSObject, ObservableObject, AVCapturePhotoCaptureDelegate 
      }
 }
 
-
-struct IdentifiableImage: Identifiable {
-  let id = UUID()
-  let image:UIImage
-}

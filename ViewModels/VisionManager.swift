@@ -1,8 +1,9 @@
 import Vision
 import AVFoundation
 import CoreImage
-import Combine
+import Observation
 
+<<<<<<< HEAD
 // Protokol delegasi untuk menjembatani flow frame dari kamera ke Vision Manager.
 protocol CameraFrameDelegate: AnyObject {
     func cameraManager(_ manager: CameraManager, didOutput sampleBuffer: CMSampleBuffer)
@@ -12,15 +13,24 @@ protocol CameraFrameDelegate: AnyObject {
 final class VisionManager: ObservableObject {
     @Published var detectedSubjects: [DetectedSubject] = []
     // Membuat antrian untuk memproses frame secara asynchronous
+=======
+@Observable
+final class VisionManager {
+    var detectedSubjects: [DetectedSubject] = []
+>>>>>>> main
     private let visionQueue = DispatchQueue(
         label: "com.cekrec.vision.processing",
         qos: .userInitiated
     )
 
     private var isProcessing = false
+<<<<<<< HEAD
     // VNRequest untuk mendeteksi bounding box human 
     // lazy var di Swift adalah properti yang inisialisasinya ditunda hingga pertama kali diakses, berguna untuk mengoptimalkan performa dan memori
     private lazy var humanDetectionRequest: VNDetectHumanRectanglesRequest = {
+=======
+    private var humanDetectionRequest: VNDetectHumanRectanglesRequest = {
+>>>>>>> main
         let request = VNDetectHumanRectanglesRequest()
         request.upperBodyOnly = false
         return request
@@ -101,6 +111,7 @@ final class VisionManager: ObservableObject {
         )
     }
 }
+<<<<<<< HEAD
 
 // Mengupdate subject dengan detected bounding box human
 extension VisionManager: CameraFrameDelegate {
@@ -109,3 +120,5 @@ extension VisionManager: CameraFrameDelegate {
         processFrame(sampleBuffer)
     }
 }
+=======
+>>>>>>> main

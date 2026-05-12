@@ -1,9 +1,6 @@
 import SwiftUI
 
-// MARK: - Liquid Glass Bar
-
-/// A reusable liquid glass container for toolbars and controls,
-/// following the iOS 26 Liquid Glass design language.
+//Liquid Glass Bar
 struct LiquidGlassBar<Content: View>: View {
     let cornerRadius: CGFloat
     @ViewBuilder let content: () -> Content
@@ -21,7 +18,7 @@ struct LiquidGlassBar<Content: View>: View {
     }
 }
 
-// MARK: - Liquid Glass Button
+// Liquid Glass Button
 
 /// An individual glass-styled icon button.
 struct LiquidGlassButton: View {
@@ -58,9 +55,7 @@ struct LiquidGlassButton: View {
     }
 }
 
-// MARK: - Glass Icon Button (compact)
-
-/// Compact circular glass button for toolbar actions.
+//Glass Icon Button (compact)
 struct GlassIconButton: View {
     let icon: String
     let action: () -> Void

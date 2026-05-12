@@ -1,9 +1,8 @@
 import SwiftUI
 
-/// Full-screen immersive photo gallery with iOS 26 Liquid Glass controls.
-/// Replaces the old sheet-based PhotoPreviewView.
+
 struct GalleryPreviewView: View {
-    @ObservedObject var cameraManager: CameraManager
+    var cameraManager: CameraManager
     @Binding var isPresented: Bool
 
     @State private var currentIndex: Int = 0
