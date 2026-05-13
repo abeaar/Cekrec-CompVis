@@ -1,1 +1,9 @@
-**/xcuserdata/
+# Xcode
+build/
+*.untracked
+*.xcuserdata
+DerivedData/
+.lsbatch/
+*.hmap
+*.ipa
+*.xcuserstate
