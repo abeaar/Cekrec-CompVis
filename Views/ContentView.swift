@@ -68,7 +68,6 @@ struct ContentView: View {
             } else {
                 //UI callback semisal belum authorisasi Camera dari user
                 VStack {
-                    Text("apapun itu yabng bisa ditulis langsung")
                     Image(systemName: "camera.fill")
                         .font(.largeTitle)
                         .foregroundStyle(.gray)
@@ -99,11 +98,7 @@ struct ContentView: View {
                             .font(.caption)
                             .foregroundStyle(.white)
                             .frame(width: 40, height: 40)
-                            .glassEffect(in: .circle)
-                            .overlay(
-                                Circle()
-                                    .fill(.black.opacity(0.3))
-                            )
+                            .glassEffect(.regular.interactive(), in: .circle)
                     }
                     
                     Spacer()
@@ -114,7 +109,7 @@ struct ContentView: View {
                             .font(.caption)
                             .foregroundStyle(.white)
                             .frame(width: 40, height: 40)
-                            .glassEffect(in: .circle)
+                            .glassEffect(.regular.interactive(), in: .circle)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -129,9 +124,7 @@ struct ContentView: View {
                             lastImage: cameraManager.lastCapturedImage,
                             photoCount: cameraManager.capturedPhotos.count,
                             action: {
-                                if !cameraManager.capturedPhotos.isEmpty {
-                                    showGallery = true
-                                }
+                                showGallery = true
                             }
                         )
                         .frame(width: 70, alignment: .center)
@@ -164,11 +157,7 @@ struct ContentView: View {
                                 .font(.title2)
                                 .foregroundStyle(.white)
                                 .frame(width: 45, height: 45)
-                                .glassEffect(in: .circle)
-                                .overlay(
-                                    Circle()
-                                        .fill(.black.opacity(0.3))
-                                )
+                                .glassEffect(.regular.interactive(), in: .circle)
                         }
                         .frame(width: 70)
                     }
@@ -177,10 +166,7 @@ struct ContentView: View {
                 }.frame(maxWidth: .infinity)
                 // Full-screen gallery
                     .fullScreenCover(isPresented: $showGallery) {
-//                        GalleryPreviewView(
-//                            cameraManager: cameraManager,
-//                            isPresented: $showGallery
-//                        )
+                        LibraryGalleryView()
                     }
             }
             .onAppear {

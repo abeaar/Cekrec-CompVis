@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6418395F2FCD7D7B000B7AD9 /* Cekrec-Icons.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6418395E2FCD7D7B000B7AD9 /* Cekrec-Icons.icon */; };
 		645908DB2FB32967009E8ED8 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 645908DA2FB32967009E8ED8 /* .gitignore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6418395E2FCD7D7B000B7AD9 /* Cekrec-Icons.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Cekrec-Icons.icon"; sourceTree = "<group>"; };
 		6450DE632FA3602200D649FD /* Cekrec.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cekrec.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		645908DA2FB32967009E8ED8 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +60,7 @@
 				642C04AE2FA34B830057DAFC /* Models */,
 				64AD70D82FA3885D0061A790 /* Views */,
 				6450DE632FA3602200D649FD /* Cekrec.app */,
+				6418395E2FCD7D7B000B7AD9 /* Cekrec-Icons.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -128,6 +131,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6418395F2FCD7D7B000B7AD9 /* Cekrec-Icons.icon in Resources */,
 				645908DB2FB32967009E8ED8 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -269,14 +273,16 @@
 		642C04772FA1BE990057DAFC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Cekrec-Icons";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VMKDVWCB45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to add to our application";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We save the photos you take to your photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need to access your photos to add them to our application";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -302,14 +308,16 @@
 		642C04782FA1BE990057DAFC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Cekrec-Icons";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VMKDVWCB45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need to take photos to add to our application";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We save the photos you take to your photo library";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need to access your photos to add them to our application";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

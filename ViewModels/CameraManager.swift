@@ -158,6 +158,8 @@ class CameraManager : NSObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDat
             print ("failed to convert photo to image")
             return
         }
+        // persist to the system Photos library so the gallery can read it back
+        UIImageWriteToSavedPhotosAlbum(uiImage, nil, nil, nil)
         //update UI on main thread
         DispatchQueue.main.async{
             [weak self] in
@@ -217,7 +219,6 @@ class CameraManager : NSObject, AVCapturePhotoCaptureDelegate, AVCaptureVideoDat
                     self.minZoomFactor,
                     min(factor, min(self.maxZoomFactor, device.activeFormat.videoMaxZoomFactor))
                 )
-                
                 CATransaction.begin()
                 CATransaction.setAnimationDuration(0.25)
                 device.ramp(toVideoZoomFactor: clamped, withRate: 5.0)

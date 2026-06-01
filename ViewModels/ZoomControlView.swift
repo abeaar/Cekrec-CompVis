@@ -4,7 +4,6 @@ struct ZoomControlView: View {
     var cameraManager: CameraManager
     
     private let zoomLevels: [CGFloat] = [0.5, 1.0, 2.0]
-    
     private let itemWidth: CGFloat = 30
     private let spacing: CGFloat = 8
     
@@ -15,7 +14,6 @@ struct ZoomControlView: View {
             return String(format: "%.1f×", zoom)
         }
     }
-    
     private func isActive(_ zoom: CGFloat) -> Bool {
         abs(cameraManager.zoomFactor - zoom) < 0.15
     }
