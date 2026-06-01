@@ -129,9 +129,7 @@ struct ContentView: View {
                             lastImage: cameraManager.lastCapturedImage,
                             photoCount: cameraManager.capturedPhotos.count,
                             action: {
-                                if !cameraManager.capturedPhotos.isEmpty {
-                                    showGallery = true
-                                }
+                                showGallery = true
                             }
                         )
                         .frame(width: 70, alignment: .center)
@@ -177,10 +175,7 @@ struct ContentView: View {
                 }.frame(maxWidth: .infinity)
                 // Full-screen gallery
                     .fullScreenCover(isPresented: $showGallery) {
-//                        GalleryPreviewView(
-//                            cameraManager: cameraManager,
-//                            isPresented: $showGallery
-//                        )
+                        LibraryGalleryView()
                     }
             }
             .onAppear {
