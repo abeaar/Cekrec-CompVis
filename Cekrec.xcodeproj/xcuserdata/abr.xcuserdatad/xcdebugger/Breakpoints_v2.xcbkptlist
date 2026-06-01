@@ -34,6 +34,36 @@
             endingLineNumber = "28"
             landmarkName = "CameraManager"
             landmarkType = "3">
+            <Locations>
+               <Location
+                  uuid = "15BF8CDC-549D-41B3-8CE5-DD72045A9380 - 79654470f733e81a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Cekrec.CameraManager.sessionQueue.getter : __C.OS_dispatch_queue"
+                  moduleName = "Cekrec.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/abr/project/Cekrec/ViewModels/CameraManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "28"
+                  endingLineNumber = "28">
+               </Location>
+               <Location
+                  uuid = "15BF8CDC-549D-41B3-8CE5-DD72045A9380 - c2532526013f44f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Cekrec.CameraManager.init() -&gt; Cekrec.CameraManager"
+                  moduleName = "Cekrec.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/abr/project/Cekrec/ViewModels/CameraManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "28"
+                  endingLineNumber = "28">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
