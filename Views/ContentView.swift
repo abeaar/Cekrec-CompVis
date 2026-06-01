@@ -177,10 +177,10 @@ struct ContentView: View {
                 }.frame(maxWidth: .infinity)
                 // Full-screen gallery
                     .fullScreenCover(isPresented: $showGallery) {
-                        GalleryPreviewView(
-                            cameraManager: cameraManager,
-                            isPresented: $showGallery
-                        )
+//                        GalleryPreviewView(
+//                            cameraManager: cameraManager,
+//                            isPresented: $showGallery
+//                        )
                     }
             }
             .onAppear {
