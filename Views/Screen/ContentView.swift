@@ -6,7 +6,7 @@ struct ContentView: View {
     private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
-
+    
     @GestureState private var pinchZoomFactor: CGFloat = 1.0
     @State private var currentZoomFactor: CGFloat = 1.0
     
@@ -21,7 +21,6 @@ struct ContentView: View {
         @unknown default:return "bolt.slash.fill"
         }
     }
-    
     var body: some View {
         // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
         ZStack {
@@ -31,23 +30,22 @@ struct ContentView: View {
                     let previewHeight = screenWidth * (16.0 / 9.0)
                     //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
                     ZStack {
-                        // karena pake UIViewRepresentable secara otomatis nge call func makeUIView, makeCoordinator. 
+                        // karena pake UIViewRepresentable secara otomatis nge call func makeUIView, makeCoordinator.
                         CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
                             .gesture(
-                            MagnifyGesture()
-                                .updating($pinchZoomFactor) { value, state, _ in
-                                    // ini bakal run terus selama jari nge pinch
-                                    state = value.magnification
-                                    let newZoom = currentZoomFactor * state
-                                    cameraManager.zoom(factor: newZoom)
-                                }
-                                .onEnded { value in
-                                    // This runs the millisecond you lift your fingers
-                                    // Save the final zoom level to memory!
-                                    currentZoomFactor = currentZoomFactor * value.magnification
-                                }
-                        )
-                        
+                                MagnifyGesture()
+                                    .updating($pinchZoomFactor) { value, state, _ in
+                                        // ini bakal run terus selama jari nge pinch
+                                        state = value.magnification
+                                        let newZoom = currentZoomFactor * state
+                                        cameraManager.zoom(factor: newZoom)
+                                    }
+                                    .onEnded { value in
+                                        // This runs the millisecond you lift your fingers
+                                        // Save the final zoom level to memory!
+                                        currentZoomFactor = currentZoomFactor * value.magnification
+                                    }
+                            )
                         if !visionManager.detectedSubjects.isEmpty {
                             BoundingBoxView(subjects: visionManager.detectedSubjects)
                         }
@@ -65,28 +63,8 @@ struct ContentView: View {
                     }
                 }
                 .ignoresSafeArea()
-            } else {
-                //UI callback semisal belum authorisasi Camera dari user
-                VStack {
-                    Image(systemName: "camera.fill")
-                        .font(.largeTitle)
-                        .foregroundStyle(.gray)
-                    Text("camera access required")
-                        .font(.largeTitle)
-                        .foregroundStyle(.gray)
-                    if cameraManager.authorizationStatus ==
-                        .denied{
-                        Text("please enable camera in settings")
-                        Button("open Settings"){
-                            if let settingsURL = URL(string: UIApplication.openSettingsURLString){
-                                UIApplication.shared.open(settingsURL)
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                    }
-                }
             }
-
+            
             // Camera controls overlay
             VStack {
                 // top bar untuk flash dan ratio
@@ -119,15 +97,17 @@ struct ContentView: View {
                 VStack(alignment: .center) {
                     ZoomControlView(cameraManager: cameraManager)
                     HStack(alignment: .center) {
-                        // Gallery thumbnail
-                        GalleryThumbnailButton(
-                            lastImage: cameraManager.lastCapturedImage,
-                            photoCount: cameraManager.capturedPhotos.count,
-                            action: {
-                                showGallery = true
-                            }
-                        )
-                        .frame(width: 70, alignment: .center)
+                        // Gallery button
+                        Button {
+                            showGallery = true
+                        } label: {
+                            Image(systemName: "photo.stack")
+                                .font(.title2)
+                                .foregroundStyle(.white)
+                                .frame(width: 45, height: 45)
+                                .glassEffect(.regular.interactive(), in: .circle)
+                        }
+                        .frame(width: 70)
                         
                         Spacer()
                         
@@ -135,12 +115,12 @@ struct ContentView: View {
                         Button {
                             cameraManager.capturePhoto()
                         } label: {
+                            
                             ZStack {
                                 Circle()
                                     .fill(.white.opacity(0.15))
                                     .frame(width: 78, height: 78)
                                     .glassEffect(in: .circle)
-                                
                                 Circle()
                                     .fill(.white)
                                     .frame(width: 62, height: 62)
@@ -166,7 +146,7 @@ struct ContentView: View {
                 }.frame(maxWidth: .infinity)
                 // Full-screen gallery
                     .fullScreenCover(isPresented: $showGallery) {
-                        LibraryGalleryView()
+                        GalleryView(isPresented: $showGallery)
                     }
             }
             .onAppear {

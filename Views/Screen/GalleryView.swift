@@ -1,12 +1,11 @@
 import SwiftUI
 import Photos
 
-struct LibraryGalleryView: View {
+struct GalleryView: View {
     @State private var viewModel = GalleryViewModel()
-    @Environment(\.dismiss) private var dismiss
+    @Binding var isPresented: Bool
 
     var body: some View {
-        // ZStack: Handles depth
         ZStack {
             Color.black.ignoresSafeArea()
 
@@ -25,7 +24,7 @@ struct LibraryGalleryView: View {
 
             VStack(spacing: 0) {
                 HStack {
-                    Button(action: { dismiss() }) {
+                    Button(action: { isPresented = false }) {
                         Image(systemName: "chevron.left")
                             .frame(width: 44, height: 44)
                             .font(.title2.weight(.medium))
@@ -130,7 +129,7 @@ struct LibraryGalleryView: View {
     }
 }
 
-private struct GalleryPageView: View {
+struct GalleryPageView: View {
     let image: UIImage?
 
     var body: some View {
@@ -149,7 +148,7 @@ private struct GalleryPageView: View {
     }
 }
 
-private struct ThumbnailView: View {
+struct ThumbnailView: View {
     let image: UIImage?
     let isSelected: Bool
 
@@ -174,5 +173,5 @@ private struct ThumbnailView: View {
 }
 
 #Preview {
-    LibraryGalleryView()
+    GalleryView(isPresented: .constant(true))
 }
