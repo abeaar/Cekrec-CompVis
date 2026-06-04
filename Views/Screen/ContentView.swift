@@ -138,7 +138,7 @@ struct ContentView: View {
                                 .foregroundStyle(.white)
                                 .frame(width: 45, height: 45)
                                 .glassEffect(.regular.interactive(), in: .circle)
-                        }   
+                        }
                         .frame(width: 70)
                     }
                     .padding(.horizontal, 24)
