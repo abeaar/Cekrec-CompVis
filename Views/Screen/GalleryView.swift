@@ -2,40 +2,19 @@ import SwiftUI
 import Photos
 
 struct GalleryView: View {
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel = GalleryViewModel()
-    @Binding var isPresented: Bool
-
+    
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            TabView(selection: $viewModel.currentIndex) {
-                ForEach(Array(viewModel.assets.enumerated()), id: \.offset) { index, asset in
-                    GalleryPageView(image: viewModel.fullImages[asset.localIdentifier])
-                        .tag(index)
-                }
+        NavigationStack {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                PhotoView(viewModel: viewModel)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .ignoresSafeArea()
-            .task(id: viewModel.currentIndex) {
-                guard viewModel.assets.indices.contains(viewModel.currentIndex) else { return }
-                await viewModel.loadImage(for: viewModel.assets[viewModel.currentIndex])
-            }
-
-            VStack(spacing: 0) {
-                HStack {
-                    Button(action: { isPresented = false }) {
-                        Image(systemName: "chevron.left")
-                            .frame(width: 44, height: 44)
-                            .font(.title2.weight(.medium))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Back")
-                    .glassEffect(.regular.interactive(), in: Circle())
-
-                    Spacer()
-
-                    VStack(spacing: 2) {
+            .navigationBarTitleDisplayMode(.automatic)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    VStack {
                         Text(viewModel.headerTitle)
                             .font(.headline)
                             .foregroundStyle(.white)
@@ -46,132 +25,65 @@ struct GalleryView: View {
                     }
                     .frame(width: 200, height: 44)
                     .glassEffect(.regular.interactive(), in: Capsule())
-
-                    Spacer()
-
-                    Button(action: {}) {
-                        Image(systemName: "ellipsis")
-                            .frame(width: 44, height: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("More")
-                    .glassEffect(.regular.interactive(), in: Capsule())
                 }
-                .padding(.horizontal, 25)
-
-                Spacer()
-
-                // --- BOTTOM AREA ---
-                VStack {
-                    ScrollViewReader { proxy in
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 2) {
-                                ForEach(Array(viewModel.assets.enumerated()), id: \.offset) { index, asset in
-                                    ThumbnailView(image: viewModel.thumbnails[asset.localIdentifier], isSelected: index == viewModel.currentIndex)
-                                        .id(index)
-                                        .onTapGesture {
-                                            withAnimation { viewModel.currentIndex = index }
-                                        }
-                                }
-                            }
-                            .padding(.horizontal, 25)
-                        }
-                        .frame(height: 60)
-                        .onChange(of: viewModel.currentIndex) { _, newValue in
-                            withAnimation { proxy.scrollTo(newValue, anchor: .center) }
-                        }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {} label: {
+                        Image(systemName: "ellipsis")
+                            .fontWeight(.semibold)
                     }
-
-                    // Action Toolbar (decorative — read-only gallery)
-                    HStack {
-                        Button(action: {}) {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.title2.weight(.medium))
-                        }
-                        .frame(width: 44, height: 44)
-                        .buttonStyle(.plain)
-                        .glassEffect(.regular.interactive(), in: Circle())
-
-                        Spacer()
-                        HStack(spacing: 40) {
-                            Button(action: {}) { Image(systemName: "heart") }
-                                .buttonStyle(.plain)
-                            Button(action: {}) { Image(systemName: "info.circle") }
-                                .buttonStyle(.plain)
-                            Button(action: {}) { Image(systemName: "line.3.horizontal") }
-                                .buttonStyle(.plain)
-                        }
-                        .font(.title2.weight(.medium))
-                        .padding(.horizontal, 15)
-                        .frame(height: 44)
-                        .glassEffect(.regular.interactive(), in: Capsule())
-
-                        Spacer()
-
-                        Button(action: {}) {
-                            Image(systemName: "trash")
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
-                        .font(.title2.weight(.medium))
-                        .glassEffect(.regular.interactive(), in: Circle())
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Button {} label: {
+                        Image(systemName: "square.and.arrow.up")
                     }
-                    .padding(.horizontal, 25)
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Spacer()
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Button {} label: {
+                        Image(systemName: "heart")
+                    }
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Button {} label: {
+                        Image(systemName: "info.circle")
+                    }
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Button {} label: {
+                        Image(systemName: "line.3.horizontal")
+                    }
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Spacer()
+                }
+                
+                ToolbarItem(placement: .bottomBar) {
+                    Button {} label: {
+                        Image(systemName: "trash")
+                    }
                 }
             }
         }
         .task {
             await viewModel.load()
-            for asset in viewModel.assets {
-                await viewModel.loadThumbnail(for: asset)
-            }
+            await viewModel.loadImage(at: viewModel.currentIndex)
         }
-    }
-}
-
-struct GalleryPageView: View {
-    let image: UIImage?
-
-    var body: some View {
-        GeometryReader { geo in
-            Group {
-                if let image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } else {
-                    Color.clear
-                }
-            }
-            .frame(width: geo.size.width, height: geo.size.height)
+        .onChange(of: viewModel.currentIndex) { _, newIndex in
+            viewModel.prefetchNextPageIfNeeded(currentIndex: newIndex)
+            Task { await viewModel.loadImage(at: newIndex) }
         }
-    }
-}
-
-struct ThumbnailView: View {
-    let image: UIImage?
-    let isSelected: Bool
-
-    var body: some View {
-        Group {
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } else {
-                Color.gray
-            }
-        }
-        .frame(width: isSelected ? 38 : 30, height: isSelected ? 48 : 40)
-        .clipShape(RoundedRectangle(cornerRadius: 3))
-        .overlay(
-            isSelected
-            ? RoundedRectangle(cornerRadius: 3).stroke(Color.white, lineWidth: 2)
-            : nil
-        )
     }
 }
 
 #Preview {
-    GalleryView(isPresented: .constant(true))
+    ContentView()
 }

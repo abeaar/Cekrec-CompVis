@@ -138,16 +138,16 @@ struct ContentView: View {
                                 .foregroundStyle(.white)
                                 .frame(width: 45, height: 45)
                                 .glassEffect(.regular.interactive(), in: .circle)
-                        }
+                        }   
                         .frame(width: 70)
                     }
                     .padding(.horizontal, 24)
                     .padding(.bottom, 30)
                 }.frame(maxWidth: .infinity)
                 // Full-screen gallery
-                    .fullScreenCover(isPresented: $showGallery) {
-                        GalleryView(isPresented: $showGallery)
-                    }
+//                    .fullScreenCover(isPresented: $showGallery) {
+//                        GalleryView(isPresented: $showGallery)
+//                    }
             }
             .onAppear {
                 cameraManager.visionManager = visionManager
