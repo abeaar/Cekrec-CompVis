@@ -2,10 +2,11 @@ import AVFoundation
 import SwiftUI
 
 struct ContentView: View {
-    private var cameraManager = CameraManager()
-    private var visionManager = VisionManager()
+    @State private var cameraManager = CameraManager()
+    @State private var visionManager = VisionManager()
     @State private var selectedGrid: GridType = .none
     @State private var showGallery: Bool = false
+    @State private var path: NavigationPath = .init()
     
     @GestureState private var pinchZoomFactor: CGFloat = 1.0
     @State private var currentZoomFactor: CGFloat = 1.0
@@ -21,140 +22,145 @@ struct ContentView: View {
         @unknown default:return "bolt.slash.fill"
         }
     }
+    
     var body: some View {
         // Zstack I untuk layering semua UI (camera UI, viewfinder,vision etc)
-        ZStack {
-            if cameraManager.authorizationStatus == .authorized {
-                GeometryReader { geo in
-                    let screenWidth = geo.size.width
-                    let previewHeight = screenWidth * (16.0 / 9.0)
-                    //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
-                    ZStack {
-                        // karena pake UIViewRepresentable secara otomatis nge call func makeUIView, makeCoordinator.
-                        CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
-                            .gesture(
-                                MagnifyGesture()
-                                    .updating($pinchZoomFactor) { value, state, _ in
-                                        // ini bakal run terus selama jari nge pinch
-                                        state = value.magnification
-                                        let newZoom = currentZoomFactor * state
-                                        cameraManager.zoom(factor: newZoom)
-                                    }
-                                    .onEnded { value in
-                                        // This runs the millisecond you lift your fingers
-                                        // Save the final zoom level to memory!
-                                        currentZoomFactor = currentZoomFactor * value.magnification
-                                    }
-                            )
-                        if !visionManager.detectedSubjects.isEmpty {
-                            BoundingBoxView(subjects: visionManager.detectedSubjects)
-                        }
-                        if selectedGrid != .none {
-                            GridOverlayView(
-                                gridType: selectedGrid,
-                                subjects: visionManager.detectedSubjects
-                            )
-                        }
-                        if cameraManager.showCaptureFlash {
-                            Color.white
-                                .transition(.opacity)
-                                .allowsHitTesting(false)
+        NavigationStack {
+            ZStack {
+                if cameraManager.authorizationStatus == .authorized {
+                    GeometryReader { geo in
+                        let screenWidth = geo.size.width
+                        let previewHeight = screenWidth * (16.0 / 9.0)
+                        //Zstack II untuk viewfinder dan overlay ke view lain cth, camera preview dan bounding box, vission manager
+                        ZStack {
+                            // karena pake UIViewRepresentable secara otomatis nge call func makeUIView, makeCoordinator.
+                            CameraPreview(session: cameraManager.session, cameraManager: cameraManager)
+                                .gesture(
+                                    MagnifyGesture()
+                                        .updating($pinchZoomFactor) { value, state, _ in
+                                            // ini bakal run terus selama jari nge pinch
+                                            state = value.magnification
+                                            let newZoom = currentZoomFactor * state
+                                            cameraManager.zoom(factor: newZoom)
+                                        }
+                                        .onEnded { value in
+                                            // This runs the millisecond you lift your fingers
+                                            // Save the final zoom level to memory!
+                                            currentZoomFactor = currentZoomFactor * value.magnification
+                                        }
+                                )
+                            if !visionManager.detectedSubjects.isEmpty {
+                                BoundingBoxView(subjects: visionManager.detectedSubjects)
+                            }
+                            if selectedGrid != .none {
+                                GridOverlayView(
+                                    gridType: selectedGrid,
+                                    subjects: visionManager.detectedSubjects
+                                )
+                            }
+                            if cameraManager.showCaptureFlash {
+                                Color.white
+                                    .transition(.opacity)
+                                    .allowsHitTesting(false)
+                            }
                         }
                     }
+                    .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
-            }
-            
-            // Camera controls overlay
-            VStack {
-                // top bar untuk flash dan ratio
-                HStack {
-                    Button {
-                        cameraManager.toggleFlash()
-                    } label: {
-                        Image(systemName: flashIcon)
-                            .font(.caption)
-                            .foregroundStyle(.white)
-                            .frame(width: 40, height: 40)
-                            .glassEffect(.regular.interactive(), in: .circle)
+                
+                // Camera controls overlay
+                VStack {
+                    // top bar untuk flash dan ratio
+                    HStack {
+                        Button {
+                            cameraManager.toggleFlash()
+                        } label: {
+                            Image(systemName: flashIcon)
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                                .frame(width: 40, height: 40)
+                                .glassEffect(.regular.interactive(), in: .circle)
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                        } label: {
+                            Text("16:9")
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                                .frame(width: 40, height: 40)
+                                .glassEffect(.regular.interactive(), in: .circle)
+                        }
                     }
+                    .padding(.horizontal, 16)
                     
                     Spacer()
                     
-                    Button {
-                    } label: {
-                        Text("16:9")
-                            .font(.caption)
-                            .foregroundStyle(.white)
-                            .frame(width: 40, height: 40)
-                            .glassEffect(.regular.interactive(), in: .circle)
-                    }
-                }
-                .padding(.horizontal, 16)
-                
-                Spacer()
-                
-                VStack(alignment: .center) {
-                    ZoomControlView(cameraManager: cameraManager)
-                    HStack(alignment: .center) {
-                        // Gallery button
-                        Button {
-                            showGallery = true
-                        } label: {
-                            Image(systemName: "photo.stack")
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .frame(width: 45, height: 45)
-                                .glassEffect(.regular.interactive(), in: .circle)
-                        }
-                        .frame(width: 70)
-                        
-                        Spacer()
-                        
-                        // Shutter button
-                        Button {
-                            cameraManager.capturePhoto()
-                        } label: {
-                            
-                            ZStack {
-                                Circle()
-                                    .fill(.white.opacity(0.15))
-                                    .frame(width: 78, height: 78)
-                                    .glassEffect(in: .circle)
-                                Circle()
-                                    .fill(.white)
-                                    .frame(width: 62, height: 62)
+                    VStack(alignment: .center) {
+                        ZoomControlView(cameraManager: cameraManager)
+                        HStack(alignment: .center) {
+                            // Gallery button
+                            NavigationLink {
+//                                showGallery = true
+                                GalleryView()
+                                    
+                            } label: {
+                                Image(systemName: "photo.stack")
+                                    .font(.title2)
+                                    .foregroundStyle(.white)
+                                    .frame(width: 45, height: 45)
+                                    .glassEffect(.regular.interactive(), in: .circle)
                             }
+                            .frame(width: 70)
+                            
+                            Spacer()
+                            
+                            // Shutter button
+                            Button {
+                                cameraManager.capturePhoto()
+                            } label: {
+                                
+                                ZStack {
+                                    Circle()
+                                        .fill(.white.opacity(0.15))
+                                        .frame(width: 78, height: 78)
+                                        .glassEffect(in: .circle)
+                                    Circle()
+                                        .fill(.white)
+                                        .frame(width: 62, height: 62)
+                                }
+                            }
+                            .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
+                            
+                            Spacer()
+                            // Composition Button
+                            Button {
+                                selectedGrid = selectedGrid.next
+                            } label: {
+                                Image(systemName: selectedGrid.iconName)
+                                    .font(.title2)
+                                    .foregroundStyle(.white)
+                                    .frame(width: 45, height: 45)
+                                    .glassEffect(.regular.interactive(), in: .circle)
+                            }
+                            .frame(width: 70)
                         }
-                        .sensoryFeedback(.impact(weight: .medium), trigger: cameraManager.capturedPhotos.count)
-                        
-                        Spacer()
-                        // Composition Button
-                        Button {
-                            selectedGrid = selectedGrid.next
-                        } label: {
-                            Image(systemName: selectedGrid.iconName)
-                                .font(.title2)
-                                .foregroundStyle(.white)
-                                .frame(width: 45, height: 45)
-                                .glassEffect(.regular.interactive(), in: .circle)
-                        }
-                        .frame(width: 70)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 30)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 30)
                 }.frame(maxWidth: .infinity)
-                // Full-screen gallery
-//                    .fullScreenCover(isPresented: $showGallery) {
-//                        GalleryView(isPresented: $showGallery)
-//                    }
             }
+//            .fullScreenCover(isPresented: $showGallery) {
+//                GalleryView()
+//            }
             .onAppear {
                 cameraManager.visionManager = visionManager
                 cameraManager.checkAuthorization()
             }
             .animation(.easeInOut(duration: 0.12), value: cameraManager.showCaptureFlash)
         }
+        
     }
 }
 
