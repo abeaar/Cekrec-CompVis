@@ -10,6 +10,7 @@ class GalleryViewModel {
     var assets: [PHAsset] = []
     var loadedCount: Int = 0 // pagination
     var state: GalleryState = .idle
+    var permissionMessage: String?
     var fullImages: [String: UIImage] = [:] //dictionaries cache to avoide reloading
     var currentIndex: Int = 0
 
@@ -18,16 +19,35 @@ class GalleryViewModel {
 
     func load() async {
         state = .loading
+        permissionMessage = nil
         let current = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch current {
-        case .authorized:
+        case .authorized, .limited:
             fetchAssets()
         case .notDetermined:
             let result = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
-            if result == .authorized { fetchAssets() }
-            
-        default:
+            switch result {
+            case .authorized, .limited:
+                fetchAssets()
+            case .denied, .restricted:
+                state = .denied
+                permissionMessage = "Photo access was denied. Enable it in Settings to view your gallery."
+            case .notDetermined:
+                state = .denied
+                permissionMessage = "Photo access was not granted."
+            @unknown default:
+                state = .denied
+                permissionMessage = "Photo access is unavailable."
+            }
+        case .denied:
             state = .denied
+            permissionMessage = "Photo access is denied. Enable it in Settings to view your gallery."
+        case .restricted:
+            state = .denied
+            permissionMessage = "Photo access is restricted on this device."
+        @unknown default:
+            state = .denied
+            permissionMessage = "Photo access is unavailable."
         }
     }
 
@@ -56,9 +76,18 @@ class GalleryViewModel {
         if currentIndex >= loadedCount - prefetchThreshold {
             loadedCount = min(loadedCount + pageSize, assets.count)
         }
-        
     }
-    
+
+    /// Prefetch the photos immediately before and after the current index so
+    /// swiping doesn't show a black flash.
+    func prefetchNeighbors(of index: Int) {
+        guard state == .loaded else { return }
+        let neighbors = [index - 1, index + 1]
+        for neighbor in neighbors where assets.indices.contains(neighbor) {
+            Task { await loadImage(at: neighbor) }
+        }
+    }
+
     func loadImage(at index: Int) async {
         guard assets.indices.contains(index) else { return }
         let asset = assets[index]
@@ -85,6 +114,9 @@ class GalleryViewModel {
     }
     
     var isDenied: Bool { state == .denied }
+    var isLimited: Bool {
+        PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited
+    }
     var headerTitle: String {
         guard let date = currentAsset?.creationDate else { return "Photo" }
         return date.formatted(.dateTime.weekday(.wide).day().month())
